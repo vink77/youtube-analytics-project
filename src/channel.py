@@ -11,16 +11,25 @@ class Channel:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
         self.channel_id = channel_id
         self.base_url = 'https://www.googleapis.com/youtube/v3/channels'
+        # YT_API_KEY скопирован из гугла и вставлен в переменные окружения
+        self.api_key: str = os.environ.get("API_YUTUBE_KEY")
+        # создать специальный объект для работы с API
+        self.youtube = build('youtube', 'v3', developerKey=api_key)
+        self.channel_id = channel_id  # HighLoad Channel
+
+
+    @classmethod
+    def get_service(cls):
+        api_key = os.getenv('API_YUTUBE_KEY')
+        youtube = build('youtube', 'v3', developerKey=api_key)
+        return youtube
 
     def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
 
-        # YT_API_KEY скопирован из гугла и вставлен в переменные окружения
-        api_key: str = os.environ.get("API_YUTUBE_KEY")
-        # создать специальный объект для работы с API
-        youtube = build('youtube', 'v3', developerKey=api_key)
 
-        channel_id = self.channel_id  # HighLoad Channel
+
+
         channel = youtube.channels().list(id=channel_id, part='snippet,statistics').execute()
         print(channel)
 
