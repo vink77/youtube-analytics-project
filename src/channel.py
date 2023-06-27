@@ -1,6 +1,5 @@
 import os
 from googleapiclient.discovery import build
-import isodate
 import json
 
 
@@ -9,14 +8,20 @@ class Channel:
 
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
-        self.channel_id = channel_id
+        self.__channel_id = channel_id
         self.base_url = 'https://www.googleapis.com/youtube/v3/channels'
         # YT_API_KEY скопирован из гугла и вставлен в переменные окружения
         self.api_key: str = os.environ.get("API_YUTUBE_KEY")
         # создать специальный объект для работы с API
-        self.youtube = build('youtube', 'v3', developerKey=api_key)
-        self.channel_id = channel_id  # HighLoad Channel
-
+        self.youtube = build('youtube', 'v3', developerKey=self.api_key)
+        self.__channel_id = channel_id  # HighLoad Channel
+        self.channel = self.youtube.channels().list(id=channel_id, part='snippet,statistics').execute()
+        self.title = self.channel["items"][0]["snippet"]["title"]
+        self.description = self.channel["items"][0]["snippet"]["description"]
+        self.url = 'https://www.youtube.com/channel/' + self.__channel_id
+        self.subscriberCount = self.channel["items"][0]["statistics"]["subscriberCount"]
+        self.video_count = self.channel["items"][0]["statistics"]["videoCount"]
+        self.viewCount = self.channel["items"][0]["statistics"]["viewCount"]
 
     @classmethod
     def get_service(cls):
@@ -24,15 +29,22 @@ class Channel:
         youtube = build('youtube', 'v3', developerKey=api_key)
         return youtube
 
+    def to_json(self, filename):
+        data = {
+                'channel_id': self.__channel_id,
+                'title': self.title,
+                'description': self.description,
+                'subscriberCount': self.subscriberCount,
+                'url': self.url,
+                'videoCount': self.video_count,
+                'viewCount': self.viewCount
+            }
+        with open(filename, 'w', encoding='UTF-8') as file:
+            json.dump(data, file, indent=2, ensure_ascii=False)
+
+
     def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
-
-
-
-
-        channel = youtube.channels().list(id=channel_id, part='snippet,statistics').execute()
-        print(channel)
-
         intro = channel["items"][0]
         print(f'\nНазвание канала - {intro["snippet"]["title"]}')
         print(f'Описание канала - {intro["snippet"]["description"]}')
