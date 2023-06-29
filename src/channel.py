@@ -44,6 +44,10 @@ class Channel:
     def __le__(self, other):
         return int(self.subscriberCount) <= int(other.subscriberCount)
 
+    def __eq__(self, other):
+        return int(self.subscriberCount) == int(other.subscriberCount)
+
+
 
     @classmethod
     def get_service(cls):
