@@ -7,7 +7,7 @@ if __name__ == '__main__':
     print(video1.__dict__)
     video2 = PLVideo('4fObz_qw9u4', 'PLv_zOGKKxVph_8g2Mqc3LMhj0M_BfasbC')
     print("\nvideo2")
-    print(video2.channel)
+    print(video2)
     print(video2.__dict__)
 
 
